@@ -1,0 +1,10 @@
+.vscode
+*.bat
+*.exe
+*.obj
+*.dll
+*.exp
+*.lib
+*.dblite
+bin/
+__pycache__/

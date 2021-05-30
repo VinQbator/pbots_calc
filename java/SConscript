@@ -19,28 +19,45 @@
 #
 import os
 
-Import('env')
-env.Append(JAVACLASSPATH=["java/jnaerator-0.11-SNAPSHOT-20121008.jar"])
-env.Java('bin','.')
-
-if env['PLATFORM'].startswith('win'):
-    fname = "calculator.bat"
-    ftext = "@set PATH=%%PATH%%;%s\r\n" % env['LD_LIBRARY_PATH']
-    args = "%*"
-    path_sep = ";"
-elif env['PLATFORM'].startswith('darwin'):
-    fname = "calculator.sh"
-    ftext = "#!/bin/sh\nexport DYLD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n" % env['LD_LIBRARY_PATH']
-    args = "$@"
-    path_sep = ":"
+if os.system("javac --version") != 0:
+    print("No JDK installed, skipping java build!")
 else:
-    fname = "calculator.sh"
-    ftext = "#!/bin/sh\nexport LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n" % env['LD_LIBRARY_PATH']
-    args = "$@"
-    path_sep = ":"
+    Import("env")
+    env.Append(JAVACLASSPATH=["java/jnaerator-0.11-SNAPSHOT-20121008.jar"])
+    env.Java("bin", ".")
 
-with open(os.path.abspath(fname),'w') as cmd:
-    cmd.write(ftext)
-    cmd.write("java -cp %s%s%s pbots_calc.Calculator %s" % (os.path.abspath('jnaerator-0.11-SNAPSHOT-20121008.jar'), path_sep, os.path.abspath('bin'), args))
+    if env["PLATFORM"].startswith("win"):
+        fname = "calculator.bat"
+        ftext = "@set PATH=%%PATH%%;%s\r\n" % env["LD_LIBRARY_PATH"]
+        args = "%*"
+        path_sep = ";"
+    elif env["PLATFORM"].startswith("darwin"):
+        fname = "calculator.sh"
+        ftext = (
+            "#!/bin/sh\nexport DYLD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n"
+            % env["LD_LIBRARY_PATH"]
+        )
+        args = "$@"
+        path_sep = ":"
+    else:
+        fname = "calculator.sh"
+        ftext = (
+            "#!/bin/sh\nexport LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n"
+            % env["LD_LIBRARY_PATH"]
+        )
+        args = "$@"
+        path_sep = ":"
 
-Execute(Chmod(os.path.abspath(fname), 0755))
+    with open(os.path.abspath(fname), "w") as cmd:
+        cmd.write(ftext)
+        cmd.write(
+            "java -cp %s%s%s pbots_calc.Calculator %s"
+            % (
+                os.path.abspath("jnaerator-0.11-SNAPSHOT-20121008.jar"),
+                path_sep,
+                os.path.abspath("bin"),
+                args,
+            )
+        )
+
+    Execute(Chmod(os.path.abspath(fname), 0o755))

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (C) 2012-2013 Owen Derby (ocderby@gmail.com)
+# Copyright (C) 2021 Eva Lond (2evalond@gmail.com)
 #
 # This file is part of pbots_calc.
 #
@@ -28,33 +29,49 @@ import ctypes
 import ctypes.util
 import sys
 
-if sys.platform.startswith('win'):
+if sys.platform.startswith("win"):
     pbots_calc = "pbots_calc"
-elif sys.platform.startswith('darwin'):
+elif sys.platform.startswith("darwin"):
     pbots_calc = "libpbots_calc.dylib"
 else:
     pbots_calc = "libpbots_calc.so"
 
+
 class _Results(ctypes.Structure):
-    _fields_ = [("ev", ctypes.POINTER(ctypes.c_double)),
-                ("hands", ctypes.POINTER(ctypes.c_char_p)),
-                ("iters", ctypes.c_int),
-                ("size", ctypes.c_int),
-                ("MC", ctypes.c_int)]
+    _fields_ = [
+        ("ev", ctypes.POINTER(ctypes.c_double)),
+        ("hands", ctypes.POINTER(ctypes.c_char_p)),
+        ("iters", ctypes.c_int),
+        ("size", ctypes.c_int),
+        ("MC", ctypes.c_int),
+    ]
+
 
 try:
     pcalc = ctypes.CDLL(pbots_calc)
-except OSError:
-    print "ERROR: Could not locate %s. Please ensure your enviroment library load path is set properly." % pbots_calc
+except OSError as e:
+    print(sys.platform)
+    print(e)
+    print(
+        "ERROR: Could not locate %s. Please ensure your enviroment library load path is set properly."
+        % pbots_calc
+    )
     sys.exit(1)
 
 # Set the argtype and return types from the library.
-pcalc.calc.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(_Results)]
+pcalc.calc.argtypes = [
+    ctypes.c_char_p,
+    ctypes.c_char_p,
+    ctypes.c_char_p,
+    ctypes.c_int,
+    ctypes.POINTER(_Results),
+]
 pcalc.calc.restype = ctypes.c_int
 pcalc.alloc_results.argtypes = []
 pcalc.alloc_results.restype = ctypes.POINTER(_Results)
 pcalc.free_results.argtypes = [ctypes.POINTER(_Results)]
 pcalc.free_results.restype = None
+
 
 class Results:
     def __init__(self, res):
@@ -70,13 +87,18 @@ class Results:
     def __str__(self):
         return str(zip(self.hands, self.ev))
 
+
 def calc(hands, board, dead, iters):
     res = pcalc.alloc_results()
+    if sys.version_info.major == 3:
+        hands = bytes(hands, encoding='utf-8')
+        board = bytes(board, encoding='utf-8')
+        dead = bytes(dead, encoding='utf-8')
     err = pcalc.calc(hands, board, dead, iters, res)
     if err > 0:
         results = Results(res[0])
     else:
-        print "error: could not parse input or something..."
+        print("error: could not parse input or something...")
         results = None
     pcalc.free_results(res)
     return results

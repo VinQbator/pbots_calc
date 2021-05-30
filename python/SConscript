@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (C) 2012-2013 Owen Derby (ocderby@gmail.com)
+# Copyright (C) 2021 Eva Lond (2evalond@gmail.com)
 #
 # This file is part of pbots_calc.
 #
@@ -19,23 +20,29 @@
 #
 import os
 
-Import('env')
+Import("env")
 
-if env['PLATFORM'].startswith('win'):
+if env["PLATFORM"].startswith("win"):
     fname = "calculator.bat"
-    ftext = "@set PATH=%%PATH%%;%s\r\n" % env['LD_LIBRARY_PATH']
+    ftext = "@set PATH=%%PATH%%;%s\r\n" % env["LD_LIBRARY_PATH"]
     args = "%*"
-elif env['PLATFORM'].startswith('darwin'):
+elif env["PLATFORM"].startswith("darwin"):
     fname = "calculator.sh"
-    ftext = "#!/bin/sh\nexport DYLD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n" % env['LD_LIBRARY_PATH']
+    ftext = (
+        "#!/bin/sh\nexport DYLD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n"
+        % env["LD_LIBRARY_PATH"]
+    )
     args = "$@"
 else:
     fname = "calculator.sh"
-    ftext = "#!/bin/sh\nexport LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n" % env['LD_LIBRARY_PATH']
+    ftext = (
+        "#!/bin/sh\nexport LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n"
+        % env["LD_LIBRARY_PATH"]
+    )
     args = "$@"
 
-with open(os.path.abspath(fname),'w') as cmd:
+with open(os.path.abspath(fname), "w") as cmd:
     cmd.write(ftext)
     cmd.write("python %s %s" % (os.path.abspath("calculator.py"), args))
 
-Execute(Chmod(os.path.abspath(fname), 0755))
+Execute(Chmod(os.path.abspath(fname), 0o755))

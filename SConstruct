@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (C) 2012-2013 Owen Derby (ocderby@gmail.com)
+# Copyright (C) 2021 Eva Lond (2evalond@gmail.com)
 #
 # This file is part of pbots_calc.
 #
@@ -18,43 +19,62 @@
 # <http://www.gnu.org/licenses/>.
 #
 
+import struct
+
+if struct.calcsize("P") * 8 != 32:
+    raise Exception("Can't run on 64 bit python (unless you remove this Exception)")
+    # could try compiling the deps for 64 bit and using "vcvars64.bat", tho
+    # TODO: check poker-eval bitness and compare to that
+
 import os
 import sys
+import json
 import subprocess
 
+
+with open("config.json") as json_file:
+    config = json.load(json_file)
+
 linkflags = []
-ccflags = ['-I.', '-MD']
+ccflags = ["-I.", "-MD"]
 platform = sys.platform
-# need to do something like  on windows?
-if sys.platform.startswith('win'):
+if sys.platform.startswith("win"):
     subprocess.call("vcvars32.bat")
-    linkflags.extend(['-OPT:REF', '-OPT:ICF', '-NOLOGO'])
-    ccflags.extend(['-W3', '-Ox', '-nologo'])
+    # subprocess.call("vcvars64.bat")
+    linkflags.extend(["-OPT:REF", "-OPT:ICF=3", "-NOLOGO"])
+    ccflags.extend(["-W4", "-Ox", "-nologo"])
+    include = config.get("lib_path")
+    lib = config.get("lib_path")
+    ld_library_path = os.path.abspath(lib)
 else:
-    linkflags.extend(['-O3'])
-    ccflags.extend(['-Wall', '-O3', '-Wpointer-arith'])
+    linkflags.extend(["-O3"])
+    ccflags.extend(["-Wall", "-O3", "-Wpointer-arith"])
+    include = "#export/%s/include" % platform
+    lib = "#export/%s/lib" % platform
+    ld_library_path = os.path.abspath(lib[1:])
 
-include = "#export/%s/include" % platform
-lib = "#export/%s/lib" % platform
-bin = "#export/%s/bin" % platform
+bindir = "#export/%s/bin" % platform
 
-ld_library_path = os.path.abspath(lib[1:])
-
-env = Environment(ENV = os.environ,
-                  TARGET_ARCH = "x86",
-                  PLATFORM = platform,
-                  CCFLAGS = ccflags,
-                  LINKFLAGS = linkflags,
-                  BINDIR = bin,
-                  INCDIR = include,
-                  LIBDIR = lib,
-                  CPPPATH = [include],
-                  LIBPATH = [lib],
-                  LD_LIBRARY_PATH = ld_library_path)
+env = Environment(
+    ENV=os.environ,
+    TARGET_ARCH="x86",
+    PLATFORM=platform,
+    CCFLAGS=ccflags,
+    LINKFLAGS=linkflags,
+    BINDIR=bindir,
+    INCDIR=include,
+    LIBDIR=lib,
+    CPPPATH=[include],
+    LIBPATH=[lib],
+    LD_LIBRARY_PATH=ld_library_path,
+)
 
 Export("env")
 
-#env.Alias('install', ['/usr/local'])
-env.Alias('build', ['.'])
+# env.Alias('install', ['/usr/local'])
+env.Alias("build", ["."])
 
-env.SConscript(["src/SConscript", "example/SConscript","java/SConscript", "python/SConscript"], exports='env')
+env.SConscript(
+    ["src/SConscript", "example/SConscript", "java/SConscript", "python/SConscript"],
+    exports="env",
+)

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (C) 2012-2013 Owen Derby (ocderby@gmail.com)
+# Copyright (C) 2021 Eva Lond (2evalond@gmail.com)
 #
 # This file is part of pbots_calc.
 #
@@ -28,15 +29,15 @@ pbots_calc library python wrapper.
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "usage: %s hand1:hand2:hand... [board [dead]]" % sys.argv[0]
+        print("usage: %s hand1:hand2:hand... [board [dead]]" % sys.argv[0])
         sys.exit(0)
     board = ""
     dead = ""
     if len(sys.argv) >= 3:
         board = sys.argv[2]
-        if len(sys.argv) >=4:
+        if len(sys.argv) >= 4:
             dead = sys.argv[3]
 
     r = pbots_calc.calc(sys.argv[1], board, dead, 1000000)
     if r:
-        print zip(r.hands, r.ev)
+        print(*zip(r.hands, r.ev))
