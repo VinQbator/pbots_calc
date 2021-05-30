@@ -20,11 +20,7 @@
 #
 
 import struct
-
-if struct.calcsize("P") * 8 != 32:
-    raise Exception("Can't run on 64 bit python (unless you remove this Exception)")
-    # could try compiling the deps for 64 bit and using "vcvars64.bat", tho
-    # TODO: check poker-eval bitness and compare to that
+is64bit = struct.calcsize("P") * 8 == 64
 
 import os
 import sys
@@ -39,8 +35,7 @@ linkflags = []
 ccflags = ["-I.", "-MD"]
 platform = sys.platform
 if sys.platform.startswith("win"):
-    subprocess.call("vcvars32.bat")
-    # subprocess.call("vcvars64.bat")
+    subprocess.call("vcvars64.bat" if is64bit else "vcvars32.bat")
     linkflags.extend(["-OPT:REF", "-OPT:ICF=3", "-NOLOGO"])
     ccflags.extend(["-W4", "-Ox", "-nologo"])
     include = config.get("lib_path")
@@ -57,7 +52,7 @@ bindir = "#export/%s/bin" % platform
 
 env = Environment(
     ENV=os.environ,
-    TARGET_ARCH="x86",
+    TARGET_ARCH="x86_64" if is64bit else "x86",
     PLATFORM=platform,
     CCFLAGS=ccflags,
     LINKFLAGS=linkflags,

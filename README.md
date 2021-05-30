@@ -21,9 +21,10 @@ The pbots_calc library is Free Software and is released under the terms of the G
 
 ## Installation
 
-Only tested as a 32-bit library, for use with 32-bit python and 32-bit java. However, there's nothing prohibiting this from working with 64-bit (just remove the safety check from `SConstruct` file). **Just make sure python, pbots_calc and poker-eval all are either 32 or 64 bit.**
+**Make sure python, pbots_calc and poker-eval all are either 32 or 64 bit.**
+Tensorflow, for example, only has x64 version on windows + anaconda.
 
-Linux and mac instructions have not been tested after updating this document to VS Community 2019 from VC++ Express 2010. Check git history in case of issues.
+Linux and mac instructions have not been tested after updating this document to x64 and VS Community 2019 from VC++ Express 2010. Check git history in case of issues.
 
 ### Linux Installation
 
@@ -41,7 +42,7 @@ Now you'll need to download, patch, and install the [poker-eval](http://pokersou
 3. Proceed according to the instructions in poker-eval/README. (summarized below for reference.
 
    a. `autoreconf --install`
-   
+
    b. `./configure`
 
    c. `make`
@@ -57,9 +58,11 @@ You will be left with the compiled library in the pbots_calc directory, under `e
 
 1. Follow step 1 from the Linux installation.
 
-2.
-   a. Install [homebrew](http://mxcl.github.com/homebrew/).
-   b. If not already installed, you need to grab the autoconf and libtool
+2. Continue with
+
+   * Install [homebrew](http://mxcl.github.com/homebrew/).
+
+   * If not already installed, you need to grab the autoconf and libtool
       packages: `brew install autoconf libtool`
 
 3. Follow step 3 and onwards from the Linux installation
@@ -80,7 +83,7 @@ First let's configure local environment.
 }
 ```
 
-Software you will need to have installed:
+Software you will need to have the following installed:
 
 1. `Python`: [Download](https://www.python.org/downloads/) and install, I prefer [miniconda](https://docs.conda.io/en/latest/miniconda.html) version, though (use only if you are familiar with conda). Remember to pick correct bitness.
 
@@ -96,15 +99,17 @@ Next, you'll need to download, modify, compile, and install the [poker-eval (hom
 
 2. Use Visual Studio to open the ``poker-eval.sln`` found in the source.
 
-   a. Ensure you are set to build a "Release" version (and not "Debug") by selecting "Release" from the drop down menu next to the "run" button (should be right below the help menu).
+   * Choose appropriate solution platform from dropdown x64/x86
 
-   b. Finally, right-click on the poker-eval project and select "build" - the output console should not report any failures!
+   * Ensure you are set to build a "Release" version (and not "Debug") by selecting "Release" from the drop down menu next to the "run" button (should be right below the help menu).
+
+   * Finally, right-click on the poker-eval project and select "build" - the output console should not report any failures!
 
 3. Open a file explorer and navigate to the location of the poker-eval library you downloaded (and just built). *TODO: lib folder setup in poker-eval.*
 
-   a. Navigate to the "Release" directory and copy the file `poker-eval.lib` to your libraries folder you set up at first.
+   * Navigate to the "Release" directory and copy the file `poker-eval.lib` to your libraries folder you set up at first.
 
-   b. Also copy the all the contents from the `include` folder in the poker-eval library, including the `inline` folder, to a new folder called ``poker-eval`` in your libraries folder.
+   * Also copy the all the contents from the `include` folder in the poker-eval library, including the `inline` folder, to a new folder called ``poker-eval`` in your libraries folder.
 
 Now, you should be able to build and install the pbots_calc library:
 

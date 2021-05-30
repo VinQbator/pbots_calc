@@ -20,9 +20,12 @@
 #
 import os
 
+import struct
+is64bit = struct.calcsize("P") * 8 == 64
+
 Import("env")
 calc_prog = env.Program(
-    target="calculator", source=["calculator.c"], LIBS=["pbots_calc", "poker-eval"]
+    target="calculator", source=["calculator.c"], LIBS=["pbots_calc", "poker-eval_x64" if is64bit else "poker-eval_x86"]
 )
 calc_prog = str(calc_prog[0])
 

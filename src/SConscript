@@ -19,9 +19,13 @@
 # <http://www.gnu.org/licenses/>.
 #
 
+
+import struct
+is64bit = struct.calcsize("P") * 8 == 64
+
 Import("env")
 pbots_calc = env.SharedLibrary(
-    target="pbots_calc", source=["pbots_calc.c", "util.c"], LIBS=["poker-eval"]
+    target="pbots_calc", source=["pbots_calc.c", "util.c"], LIBS=["poker-eval_x64" if is64bit else "poker-eval_x86"]
 )
 env.Install("$LIBDIR", pbots_calc)
 env.Install("$INCDIR", "pbots_calc.h")
