@@ -4,6 +4,15 @@
 
 ## Introduction
 
+As simple as that
+```powershell
+PS D:\pbots_calc> .\example\calculator.bat 4qo:jts+
+
+After 1000000 iterations of Monte Carlo Simulation, EV:
+4qo: 0.361006
+jts+: 0.638994
+```
+
 pbots_calc is a ranged Equity Calculator. Originally developed for poker bots in the MIT Pokerbots Competition! (mitpokerbots.com)
 
 pbots_calc is a library for calculating the showdown equity for regular texas hold'em hands, with limited support for pineapple variants. It supports common 2-card hand range syntax (see documentation for full details), and handles any number of players. It's built in C, using the [poker-eval](http://pokersource.sourceforge.net/) library for fast hand evaluation, and provides wrappers for python and java. It has reasonable speed, but there are certainly many areas for optimization and improvements.
